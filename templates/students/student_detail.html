@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ student.full_name }} - SCMS{% endblock %}
+
+{% block content %}
+<div class="animate-slide-in">
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="/students/" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Orqaga qaytish
+        </a>
+    </div>
+
+    <!-- Student Profile Card -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+        <div class="bg-gradient-to-r from-purple-600 to-pink-600 h-32 relative">
+            <div class="absolute -bottom-16 left-8">
+                <div class="w-32 h-32 rounded-full border-4 border-white bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-white text-5xl font-bold shadow-xl">
+                    {{ student.full_name|slice:":1"|upper }}
+                </div>
+            </div>
+            <div class="absolute top-4 right-4">
+                <button onclick="confirmDelete()" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg font-medium transition-all flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                    <span>O'chirish</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="pt-20 px-8 pb-8">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ student.full_name }}</h1>
+                    <p class="text-gray-600 text-lg">{{ student.email }}</p>
+                </div>
+            </div>
+
+            <!-- Student Info Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-blue-50 rounded-lg p-6">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-blue-100 rounded-full p-3">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Yosh</p>
+                            <p class="text-2xl font-bold text-gray-900">{{ student.age }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-purple-50 rounded-lg p-6">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-purple-100 rounded-full p-3">
+                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Kurslar</p>
+                            <p class="text-2xl font-bold text-gray-900">{{ enrollments.count }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-green-50 rounded-lg p-6">
+                    <div class="flex items-center space-x-4">
+                        <div class="bg-green-100 rounded-full p-3">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Ro'yxatdan o'tgan</p>
+                            <p class="text-lg font-semibold text-gray-900">{{ student.created_at|date:"d.m.Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enrolled Courses Section -->
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">Ro'yxatdan o'tgan kurslar</h2>
+            <a href="/enrollments/create/?student={{ student.id }}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors flex items-center space-x-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                <span>Kurs qo'shish</span>
+            </a>
+        </div>
+
+        {% if enrollments %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for enrollment in enrollments %}
+            <div class="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">
+                            {{ enrollment.course.title }}
+                        </h3>
+                        <p class="text-gray-600 text-sm mb-3">
+                            {{ enrollment.course.description|truncatewords:15|default:"Tavsif mavjud emas" }}
+                        </p>
+                    </div>
+                    <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded ml-2">
+                        {{ enrollment.course.duration_weeks }} hafta
+                    </span>
+                </div>
+
+                <div class="flex items-center justify-between pt-4 border-t">
+                    <div class="flex items-center text-sm text-gray-500">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>{{ enrollment.enrolled_at|date:"d.m.Y" }}</span>
+                    </div>
+                    <a href="/courses/{{ enrollment.course.id }}/" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        Ko'rish
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Course Timeline -->
+        <div class="mt-8 pt-8 border-t">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">O'quv tarixchasi</h3>
+            <div class="relative">
+                <div class="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                {% for enrollment in enrollments %}
+                <div class="relative pl-12 pb-8 last:pb-0">
+                    <div class="absolute left-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        {{ forloop.counter }}
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <p class="font-semibold text-gray-900">{{ enrollment.course.title }}</p>
+                        <p class="text-sm text-gray-600">{{ enrollment.enrolled_at|date:"d F Y, H:i" }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+            </svg>
+            <h3 class="text-lg font-semibold text-gray-700 mb-2">Hozircha kurslar yo'q</h3>
+            <p class="text-gray-500 mb-6">Bu studentni biror kursga ro'yxatdan o'tkazing!</p>
+            <a href="/enrollments/create/?student={{ student.id }}" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Kursga yozish
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-lg bg-white">
+        <div class="mt-3 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">Studentni o'chirish</h3>
+            <div class="mt-2 px-7 py-3">
+                <p class="text-sm text-gray-500">
+                    <strong>{{ student.full_name }}</strong> studentini o'chirishga ishonchingiz komilmi? Bu amalni qaytarib bo'lmaydi.
+                </p>
+            </div>
+            <div class="flex space-x-4 px-4 py-3">
+                <button onclick="closeModal()" class="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium">
+                    Bekor qilish
+                </button>
+                <form action="/students/{{ student.id }}/delete/" method="POST" class="flex-1">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium">
+                        O'chirish
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function confirmDelete() {
+        document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('deleteModal').classList.add('hidden');
+    }
+
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+</script>
+{% endblock %}

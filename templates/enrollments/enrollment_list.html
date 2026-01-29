@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Ro'yxatdan o'tishlar - SCMS{% endblock %}
+
+{% block content %}
+<div class="animate-slide-in">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Ro'yxatdan o'tishlar</h1>
+            <p class="text-gray-600 mt-1">Barcha studentlarning kurslarga yozilish ma'lumotlari</p>
+        </div>
+        <a href="/enrollments/create/" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors shadow-md hover:shadow-lg flex items-center space-x-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span>Yangi ro'yxat</span>
+        </a>
+    </div>
+
+    <!-- Statistics -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-green-100 text-sm">Jami ro'yxatlar</p>
+                    <p class="text-3xl font-bold mt-1">{{ enrollments.count }}</p>
+                </div>
+                <div class="bg-white bg-opacity-20 rounded-full p-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-blue-100 text-sm">Faol kurslar</p>
+                    <p class="text-3xl font-bold mt-1">{{ active_courses }}</p>
+                </div>
+                <div class="bg-white bg-opacity-20 rounded-full p-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-purple-100 text-sm">Faol studentlar</p>
+                    <p class="text-3xl font-bold mt-1">{{ active_students }}</p>
+                </div>
+                <div class="bg-white bg-opacity-20 rounded-full p-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-orange-100 text-sm">Bugun</p>
+                    <p class="text-3xl font-bold mt-1">{{ today_enrollments }}</p>
+                </div>
+                <div class="bg-white bg-opacity-20 rounded-full p-3">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enrollments Table -->
+    {% if enrollments %}
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">№</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kurs</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Davomiyligi</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ro'yxatdan o'tgan</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amallar</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for enrollment in enrollments %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ forloop.counter }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center text-white font-semibold">
+                                        {{ enrollment.student.full_name|slice:":1"|upper }}
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">{{ enrollment.student.full_name }}</div>
+                                    <div class="text-sm text-gray-500">{{ enrollment.student.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-medium text-gray-900">{{ enrollment.course.title }}</div>
+                            <div class="text-sm text-gray-500">{{ enrollment.course.description|truncatewords:10|default:"Tavsif yo'q" }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                {{ enrollment.course.duration_weeks }} hafta
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <div class="flex flex-col">
+                                <span>{{ enrollment.enrolled_at|date:"d.m.Y" }}</span>
+                                <span class="text-xs text-gray-400">{{ enrollment.enrolled_at|date:"H:i" }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                            <a href="/students/{{ enrollment.student.id }}/" class="text-purple-600 hover:text-purple-900 transition-colors">
+                                Student
+                            </a>
+                            <span class="text-gray-300">|</span>
+                            <a href="/courses/{{ enrollment.course.id }}/" class="text-blue-600 hover:text-blue-900 transition-colors">
+                                Kurs
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Info -->
+        <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+            <p class="text-sm text-gray-700">
+                Jami <span class="font-semibold">{{ enrollments.count }}</span> ta ro'yxat ko'rsatilmoqda
+            </p>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-16 bg-white rounded-lg shadow">
+        <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <h3 class="text-xl font-semibold text-gray-700 mb-2">Hozircha ro'yxatlar yo'q</h3>
+        <p class="text-gray-500 mb-6">Studentlarni kurslarga yozib boshlang!</p>
+        <a href="/enrollments/create/" class="inline-flex items-center bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Birinchi ro'yxatni yaratish
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Recent Activity -->
+    {% if enrollments %}
+    <div class="mt-8 bg-white rounded-lg shadow-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">So'nggi faollik</h2>
+        <div class="space-y-4">
+            {% for enrollment in enrollments|slice:":5" %}
+            <div class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                <div class="flex-shrink-0">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-r from-green-400 to-blue-400 flex items-center justify-center text-white font-bold">
+                        {{ enrollment.student.full_name|slice:":1"|upper }}
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-900">
+                        <span class="font-bold">{{ enrollment.student.full_name }}</span> 
+                        <span class="text-gray-600">"{{ enrollment.course.title }}" kursiga yozildi</span>
+                    </p>
+                    <p class="text-xs text-gray-500">{{ enrollment.enrolled_at|date:"d F Y, H:i" }}</p>
+                </div>
+                <div class="flex space-x-2">
+                    <a href="/students/{{ enrollment.student.id }}/" class="text-blue-600 hover:text-blue-800">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+
+{% block title %}Yangi student - SCMS{% endblock %}
+
+{% block content %}
+<div class="animate-slide-in max-w-3xl mx-auto">
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="/students/" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Orqaga qaytish
+        </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-purple-600 to-pink-600 px-8 py-6">
+            <h1 class="text-3xl font-bold text-white">Yangi student qo'shish</h1>
+            <p class="text-purple-100 mt-2">Yangi studentni tizimga ro'yxatdan o'tkazing</p>
+        </div>
+
+        <!-- Form -->
+        <div class="p-8">
+            <form method="POST" id="studentForm" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Full Name Field -->
+                <div>
+                    <label for="full_name" class="block text-sm font-medium text-gray-700 mb-2">
+                        To'liq ism <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="full_name" 
+                        id="full_name" 
+                        value="{% if form.full_name.value %}{{ form.full_name.value }}{% endif %}"
+                        required
+                        maxlength="150"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        placeholder="Masalan: Aliyev Vali Ahmedovich"
+                    >
+                    {% if form.full_name.errors %}
+                    <p class="mt-2 text-sm text-red-600">
+                        {{ form.full_name.errors.0 }}
+                    </p>
+                    {% endif %}
+                    <p class="mt-2 text-sm text-gray-500">
+                        Qolgan belgilar: <span id="nameCounter">150</span>
+                    </p>
+                </div>
+
+                <!-- Email Field -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                        Email manzil <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <input 
+                            type="email" 
+                            name="email" 
+                            id="email" 
+                            value="{% if form.email.value %}{{ form.email.value }}{% endif %}"
+                            required
+                            class="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                            placeholder="student@example.com"
+                        >
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    {% if form.email.errors %}
+                    <p class="mt-2 text-sm text-red-600">
+                        {{ form.email.errors.0 }}
+                    </p>
+                    {% endif %}
+                    <p class="mt-2 text-sm text-gray-500">
+                        Noyob email manzil kiritilishi kerak
+                    </p>
+                </div>
+
+                <!-- Age Field -->
+                <div>
+                    <label for="age" class="block text-sm font-medium text-gray-700 mb-2">
+                        Yosh <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <input 
+                            type="number" 
+                            name="age" 
+                            id="age" 
+                            value="{% if form.age.value %}{{ form.age.value }}{% endif %}"
+                            required
+                            min="16"
+                            max="100"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                            placeholder="18"
+                        >
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    {% if form.age.errors %}
+                    <p class="mt-2 text-sm text-red-600">
+                        {{ form.age.errors.0 }}
+                    </p>
+                    {% endif %}
+                    <p class="mt-2 text-sm text-gray-500">
+                        Student kamida 16 yoshda bo'lishi kerak
+                    </p>
+                </div>
+
+                <!-- Info Box -->
+                <div class="bg-purple-50 border-l-4 border-purple-500 p-4 rounded">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-purple-700">
+                                <span class="font-medium">Eslatma:</span> Email manzil tizimda noyob bo'lishi kerak. Agar email band bo'lsa, boshqa manzil kiriting.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center justify-between pt-6 border-t">
+                    <a 
+                        href="/students/" 
+                        class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                    >
+                        Bekor qilish
+                    </a>
+                    <button 
+                        type="submit" 
+                        class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 rounded-lg font-medium transition-all shadow-md hover:shadow-lg flex items-center space-x-2"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                        </svg>
+                        <span>Student qo'shish</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Preview Card -->
+    <div class="mt-8 bg-white rounded-lg shadow-lg p-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Ko'rinish</h2>
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
+            <div class="flex items-center space-x-4">
+                <div id="previewAvatar" class="w-16 h-16 rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center text-white text-2xl font-bold">
+                    ?
+                </div>
+                <div class="flex-1">
+                    <h3 id="previewName" class="text-xl font-bold text-gray-900 mb-1">Ism kiritilmagan</h3>
+                    <p id="previewEmail" class="text-sm text-gray-500 mb-1">Email kiritilmagan</p>
+                    <p id="previewAge" class="text-sm text-gray-600">Yosh: —</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tips Card -->
+    <div class="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-3">💡 Foydali maslahatlar</h3>
+        <ul class="space-y-2 text-sm text-gray-700">
+            <li class="flex items-start">
+                <svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <span>To'liq ismni uch qismda (Familiya Ism Otasining ismi) kiriting</span>
+            </li>
+            <li class="flex items-start">
+                <svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <span>Email manzilni diqqat bilan tekshiring - u noyob bo'lishi kerak</span>
+            </li>
+            <li class="flex items-start">
+                <svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <span>Student qo'shilgandan keyin uni kurslarga yozishingiz mumkin</span>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Character counter for name
+    const nameInput = document.getElementById('full_name');
+    const nameCounter = document.getElementById('nameCounter');
+    
+    nameInput.addEventListener('input', function() {
+        const remaining = 150 - this.value.length;
+        nameCounter.textContent = remaining;
+        nameCounter.className = remaining < 20 ? 'text-red-600 font-semibold' : '';
+    });
+
+    // Live preview
+    const previewName = document.getElementById('previewName');
+    const previewEmail = document.getElementById('previewEmail');
+    const previewAge = document.getElementById('previewAge');
+    const previewAvatar = document.getElementById('previewAvatar');
+    const emailInput = document.getElementById('email');
+    const ageInput = document.getElementById('age');
+
+    nameInput.addEventListener('input', function() {
+        previewName.textContent = this.value || 'Ism kiritilmagan';
+        const initial = this.value ? this.value.charAt(0).toUpperCase() : '?';
+        previewAvatar.textContent = initial;
+    });
+
+    emailInput.addEventListener('input', function() {
+        previewEmail.textContent = this.value || 'Email kiritilmagan';
+    });
+
+    ageInput.addEventListener('input', function() {
+        previewAge.textContent = this.value ? `Yosh: ${this.value}` : 'Yosh: —';
+    });
+
+    // Form validation
+    document.getElementById('studentForm').addEventListener('submit', function(e) {
+        const age = parseInt(document.getElementById('age').value);
+        const email = document.getElementById('email').value;
+        
+        if (age < 16) {
+            e.preventDefault();
+            alert('Student kamida 16 yoshda bo\'lishi kerak!');
+            return false;
+        }
+        
+        if (!email.includes('@')) {
+            e.preventDefault();
+            alert('To\'g\'ri email manzil kiriting!');
+            return false;
+        }
+    });
+
+    // Email validation helper
+    emailInput.addEventListener('blur', function() {
+        if (this.value && !this.value.includes('@')) {
+            this.classList.add('border-red-500');
+        } else {
+            this.classList.remove('border-red-500');
+        }
+    });
+
+    // Age validation helper
+    ageInput.addEventListener('input', function() {
+        const age = parseInt(this.value);
+        if (age && age < 16) {
+            this.classList.add('border-red-500');
+        } else {
+            this.classList.remove('border-red-500');
+        }
+    });
+</script>
+{% endblock %}

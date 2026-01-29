@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if course %}Tahrirlash{% else %}Yangi kurs{% endif %} - SCMS{% endblock %}
+
+{% block content %}
+<div class="animate-slide-in max-w-3xl mx-auto">
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="{% if course %}/courses/{{ course.id }}/{% else %}/courses/{% endif %}" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Orqaga qaytish
+        </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-6">
+            <h1 class="text-3xl font-bold text-white">
+                {% if course %}
+                    Kursni tahrirlash
+                {% else %}
+                    Yangi kurs yaratish
+                {% endif %}
+            </h1>
+            <p class="text-blue-100 mt-2">
+                {% if course %}
+                    "{{ course.title }}" kursini yangilash
+                {% else %}
+                    Yangi o'quv kursini tizimga qo'shish
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Form -->
+        <div class="p-8">
+            <form method="POST" id="courseForm" class="space-y-6">
+                {% csrf_token %}
+
+                <!-- Title Field -->
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
+                        Kurs nomi <span class="text-red-500">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="title" 
+                        id="title" 
+                        value="{% if form.title.value %}{{ form.title.value }}{% endif %}"
+                        required
+                        maxlength="200"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        placeholder="Masalan: Python dasturlash asoslari"
+                    >
+                    {% if form.title.errors %}
+                    <p class="mt-2 text-sm text-red-600">
+                        {{ form.title.errors.0 }}
+                    </p>
+                    {% endif %}
+                    <p class="mt-2 text-sm text-gray-500">
+                        Qolgan belgilar: <span id="titleCounter">200</span>
+                    </p>
+                </div>
+
+                <!-- Description Field -->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                        Tavsif
+                    </label>
+                    <textarea 
+                        name="description" 
+                        id="description" 
+                        rows="5"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                        placeholder="Kurs haqida batafsil ma'lumot..."
+                    >{% if form.description.value %}{{ form.description.value }}{% endif %}</textarea>
+                    {% if form.description.errors %}
+                    <p class="mt-2 text-sm text-red-600">
+                        {{ form.description.errors.0 }}
+                    </p>
+                    {% endif %}
+                    <p class="mt-2 text-sm text-gray-500">
+                        Kurs mazmuni, maqsadlari va natijalarini yozing
+                    </p>
+                </div>
+
+                <!-- Duration Field -->
+                <div>
+                    <label for="duration_weeks" class="block text-sm font-medium text-gray-700 mb-2">
+                        Davomiyligi (haftalarda) <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <input 
+                            type="number" 
+                            name="duration_weeks" 
+                            id="duration_weeks" 
+                            value="{% if form.duration_weeks.value %}{{ form.duration_weeks.value }}{% endif %}"
+                            required
+                            min="1"
+                            max="52"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            placeholder="12"
+                        >
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    {% if form.duration_weeks.errors %}
+                    <p class="mt-2 text-sm text-red-600">
+                        {{ form.duration_weeks.errors.0 }}
+                    </p>
+                    {% endif %}
+                    <p class="mt-2 text-sm text-gray-500">
+                        Kurs davomiyligi 1 dan 52 haftagacha bo'lishi mumkin
+                    </p>
+                </div>
+
+                <!-- Info Box -->
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-blue-700">
+                                <span class="font-medium">Eslatma:</span> Faqat belgilangan maydonlar (*) to'ldirilishi shart.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center justify-between pt-6 border-t">
+                    <a 
+                        href="{% if course %}/courses/{{ course.id }}/{% else %}/courses/{% endif %}" 
+                        class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                    >
+                        Bekor qilish
+                    </a>
+                    <button 
+                        type="submit" 
+                        class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 rounded-lg font-medium transition-all shadow-md hover:shadow-lg flex items-center space-x-2"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>{% if course %}Saqlash{% else %}Yaratish{% endif %}</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Preview Card (for create mode) -->
+    {% if not course %}
+    <div class="mt-8 bg-white rounded-lg shadow-lg p-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Ko'rinish</h2>
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
+            <div class="flex items-start justify-between mb-3">
+                <h3 id="previewTitle" class="text-xl font-bold text-gray-900">Kurs nomi</h3>
+                <span id="previewDuration" class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded">
+                    0 hafta
+                </span>
+            </div>
+            <p id="previewDescription" class="text-gray-600 text-sm">
+                Tavsif kiritilmagan
+            </p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Character counter for title
+    const titleInput = document.getElementById('title');
+    const titleCounter = document.getElementById('titleCounter');
+    
+    if (titleInput && titleCounter) {
+        titleInput.addEventListener('input', function() {
+            const remaining = 200 - this.value.length;
+            titleCounter.textContent = remaining;
+            titleCounter.className = remaining < 20 ? 'text-red-600 font-semibold' : '';
+        });
+        
+        // Initial count
+        titleCounter.textContent = 200 - titleInput.value.length;
+    }
+
+    // Live preview (only for create mode)
+    {% if not course %}
+    const previewTitle = document.getElementById('previewTitle');
+    const previewDescription = document.getElementById('previewDescription');
+    const previewDuration = document.getElementById('previewDuration');
+    const descriptionInput = document.getElementById('description');
+    const durationInput = document.getElementById('duration_weeks');
+
+    titleInput.addEventListener('input', function() {
+        previewTitle.textContent = this.value || 'Kurs nomi';
+    });
+
+    descriptionInput.addEventListener('input', function() {
+        previewDescription.textContent = this.value || 'Tavsif kiritilmagan';
+    });
+
+    durationInput.addEventListener('input', function() {
+        previewDuration.textContent = (this.value || '0') + ' hafta';
+    });
+    {% endif %}
+
+    // Form validation
+    document.getElementById('courseForm').addEventListener('submit', function(e) {
+        const duration = parseInt(document.getElementById('duration_weeks').value);
+        
+        if (duration < 1) {
+            e.preventDefault();
+            alert('Davomiylik kamida 1 hafta bo\'lishi kerak!');
+            return false;
+        }
+        
+        if (duration > 52) {
+            e.preventDefault();
+            alert('Davomiylik ko\'pi bilan 52 hafta bo\'lishi mumkin!');
+            return false;
+        }
+    });
+
+    // Auto-save to localStorage (optional feature)
+    if (!{% if course %}true{% else %}false{% endif %}) {
+        const formInputs = document.querySelectorAll('#courseForm input, #courseForm textarea');
+        
+        formInputs.forEach(input => {
+            // Load saved value
+            const savedValue = localStorage.getItem('course_' + input.name);
+            if (savedValue && !input.value) {
+                input.value = savedValue;
+            }
+            
+            // Save on change
+            input.addEventListener('input', function() {
+                localStorage.setItem('course_' + this.name, this.value);
+            });
+        });
+        
+        // Clear localStorage on successful submit
+        document.getElementById('courseForm').addEventListener('submit', function() {
+            formInputs.forEach(input => {
+                localStorage.removeItem('course_' + input.name);
+            });
+        });
+    }
+</script>
+{% endblock %}

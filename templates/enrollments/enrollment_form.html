@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+
+{% block title %}Studentni kursga yozish - SCMS{% endblock %}
+
+{% block content %}
+<div class="animate-slide-in max-w-4xl mx-auto">
+    <!-- Back Button -->
+    <div class="mb-6">
+        <a href="/enrollments/" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Orqaga qaytish
+        </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-green-600 to-teal-600 px-8 py-6">
+            <h1 class="text-3xl font-bold text-white">Studentni kursga yozish</h1>
+            <p class="text-green-100 mt-2">Studentni o'quv kursiga ro'yxatdan o'tkazing</p>
+        </div>
+
+        <!-- Form -->
+        <div class="p-8">
+            <form method="POST" id="enrollmentForm" class="space-y-8">
+                {% csrf_token %}
+
+                <!-- Student Selection -->
+                <div>
+                    <label for="student" class="block text-sm font-medium text-gray-700 mb-2">
+                        Student <span class="text-red-500">*</span>
+                    </label>
+                    <select 
+                        name="student" 
+                        id="student" 
+                        required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    >
+                        <option value="">Studentni tanlang...</option>
+                        {% for student in students %}
+                        <option value="{{ student.id }}" {% if request.GET.student == student.id|stringformat:"s" %}selected{% endif %}>
+                            {{ student.full_name }} ({{ student.email }}) - {{ student.age }} yosh
+                        </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.student.errors %}
+                    <p class="mt-2 text-sm text-red-600">
+                        {{ form.student.errors.0 }}
+                    </p>
+                    {% endif %}
+                    <p class="mt-2 text-sm text-gray-500 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Ro'yxatdan o'tkazmoqchi bo'lgan studentni tanlang
+                    </p>
+                </div>
+
+                <!-- Course Selection -->
+                <div>
+                    <label for="course" class="block text-sm font-medium text-gray-700 mb-2">
+                        Kurs <span class="text-red-500">*</span>
+                    </label>
+                    <select 
+                        name="course" 
+                        id="course" 
+                        required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    >
+                        <option value="">Kursni tanlang...</option>
+                        {% for course in courses %}
+                        <option 
+                            value="{{ course.id }}" 
+                            data-duration="{{ course.duration_weeks }}"
+                            data-description="{{ course.description|truncatewords:20 }}"
+                            {% if request.GET.course == course.id|stringformat:"s" %}selected{% endif %}
+                        >
+                            {{ course.title }} ({{ course.duration_weeks }} hafta)
+                        </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.course.errors %}
+                    <p class="mt-2 text-sm text-red-600">
+                        {{ form.course.errors.0 }}
+                    </p>
+                    {% endif %}
+                    <p class="mt-2 text-sm text-gray-500 flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Student qaysi kursga yozilishini tanlang
+                    </p>
+                </div>
+
+                <!-- Course Info Display -->
+                <div id="courseInfo" class="hidden bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-lg">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <svg class="h-6 w-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3 flex-1">
+                            <h3 class="text-sm font-medium text-blue-800 mb-2">Kurs haqida ma'lumot</h3>
+                            <div class="text-sm text-blue-700 space-y-2">
+                                <p><span class="font-semibold">Davomiyligi:</span> <span id="courseDuration">—</span></p>
+                                <p><span class="font-semibold">Tavsif:</span> <span id="courseDescription">—</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warning Box -->
+                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700">
+                                <span class="font-medium">Diqqat:</span> Bitta student bitta kursga faqat bir marta yozilishi mumkin. Agar student avval shu kursga yozilgan bo'lsa, xato xabari paydo bo'ladi.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <a href="/students/create/" class="flex items-center justify-center px-4 py-3 border-2 border-purple-300 border-dashed rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-all">
+                        <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                        </svg>
+                        <span class="text-purple-700 font-medium">Yangi student qo'shish</span>
+                    </a>
+                    <a href="/courses/create/" class="flex items-center justify-center px-4 py-3 border-2 border-blue-300 border-dashed rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all">
+                        <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span class="text-blue-700 font-medium">Yangi kurs yaratish</span>
+                    </a>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center justify-between pt-6 border-t">
+                    <a 
+                        href="/enrollments/" 
+                        class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                    >
+                        Bekor qilish
+                    </a>
+                    <button 
+                        type="submit" 
+                        class="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-8 py-3 rounded-lg font-medium transition-all shadow-md hover:shadow-lg flex items-center space-x-2"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Ro'yxatdan o'tkazish</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Preview Card -->
+    <div class="mt-8 bg-white rounded-lg shadow-lg p-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Ko'rib chiqish</h2>
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-4">
+                    <div id="previewAvatar" class="w-16 h-16 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center text-white text-2xl font-bold">
+                        ?
+                    </div>
+                    <div>
+                        <h3 id="previewStudent" class="text-lg font-bold text-gray-900">Student tanlanmagan</h3>
+                        <p class="text-sm text-gray-500">Email: —</p>
+                    </div>
+                </div>
+                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
+                <div class="text-right">
+                    <h3 id="previewCourse" class="text-lg font-bold text-gray-900">Kurs tanlanmagan</h3>
+                    <p class="text-sm text-gray-500">Davomiyligi: —</p>
+                </div>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4 text-center">
+                <p class="text-sm text-gray-600">
+                    Ro'yxatdan o'tkazish vaqti: <span class="font-semibold">{{ now|date:"d.m.Y H:i" }}</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Section -->
+    <div class="mt-8 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg p-6">
+        <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center">
+            <svg class="w-6 h-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Yordam
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+            <div class="flex items-start">
+                <svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <span>Har bir student bitta kursga faqat bir marta yozilishi mumkin</span>
+            </div>
+            <div class="flex items-start">
+                <svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <span>Ro'yxatdan o'tgan vaqt avtomatik saqlanadi</span>
+            </div>
+            <div class="flex items-start">
+                <svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <span>Student va kurs tanlov majburiy maydonlar</span>
+            </div>
+            <div class="flex items-start">
+                <svg class="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <span>Takroriy ro'yxatdan o'tish avtomatik bloklangan</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const studentSelect = document.getElementById('student');
+    const courseSelect = document.getElementById('course');
+    const courseInfo = document.getElementById('courseInfo');
+    const courseDuration = document.getElementById('courseDuration');
+    const courseDescription = document.getElementById('courseDescription');
+    const previewStudent = document.getElementById('previewStudent');
+    const previewCourse = document.getElementById('previewCourse');
+    const previewAvatar = document.getElementById('previewAvatar');
+
+    // Update course info when course is selected
+    courseSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        
+        if (this.value) {
+            const duration = selectedOption.dataset.duration;
+            const description = selectedOption.dataset.description;
+            
+            courseDuration.textContent = duration + ' hafta';
+            courseDescription.textContent = description || 'Tavsif mavjud emas';
+            courseInfo.classList.remove('hidden');
+            
+            // Update preview
+            previewCourse.textContent = selectedOption.text;
+            document.querySelector('#previewCourse + p').textContent = `Davomiyligi: ${duration} hafta`;
+        } else {
+            courseInfo.classList.add('hidden');
+            previewCourse.textContent = 'Kurs tanlanmagan';
+            document.querySelector('#previewCourse + p').textContent = 'Davomiyligi: —';
+        }
+    });
+
+    // Update student preview
+    studentSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        
+        if (this.value) {
+            const text = selectedOption.text;
+            const match = text.match(/^(.+?) \((.+?)\)/);
+            
+            if (match) {
+                const name = match[1];
+                const email = match[2];
+                
+                previewStudent.textContent = name;
+                document.querySelector('#previewStudent + p').textContent = `Email: ${email}`;
+                previewAvatar.textContent = name.charAt(0).toUpperCase();
+            }
+        } else {
+            previewStudent.textContent = 'Student tanlanmagan';
+            document.querySelector('#previewStudent + p').textContent = 'Email: —';
+            previewAvatar.textContent = '?';
+        }
+    });
+
+    // Trigger change events if pre-selected (from GET params)
+    if (studentSelect.value) {
+        studentSelect.dispatchEvent(new Event('change'));
+    }
+    if (courseSelect.value) {
+        courseSelect.dispatchEvent(new Event('change'));
+    }
+
+    // Form validation
+    document.getElementById('enrollmentForm').addEventListener('submit', function(e) {
+        if (!studentSelect.value || !courseSelect.value) {
+            e.preventDefault();
+            alert('Iltimos, student va kursni tanlang!');
+            return false;
+        }
+    });
+</script>
+{% endblock %}
