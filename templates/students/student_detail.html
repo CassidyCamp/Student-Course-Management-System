@@ -67,28 +67,41 @@
                             <p class="text-sm text-gray-600">Kurslar</p>
                             <p class="text-2xl font-bold text-gray-900">{{ enrollments.count }}</p>
                         </div>
+
                     </div>
+
                 </div>
 
                 <div class="bg-green-50 rounded-lg p-6">
+
                     <div class="flex items-center space-x-4">
+
                         <div class="bg-green-100 rounded-full p-3">
+                            
                             <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
+
                         </div>
+
                         <div>
                             <p class="text-sm text-gray-600">Ro'yxatdan o'tgan</p>
                             <p class="text-lg font-semibold text-gray-900">{{ student.created_at|date:"d.m.Y" }}</p>
                         </div>
+                    
                     </div>
+                
                 </div>
+            
             </div>
+        
         </div>
+    
     </div>
 
     <!-- Enrolled Courses Section -->
     <div class="bg-white rounded-lg shadow-lg p-8">
+        
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-900">Ro'yxatdan o'tgan kurslar</h2>
             <a href="/enrollments/create/?student={{ student.id }}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors flex items-center space-x-2">
